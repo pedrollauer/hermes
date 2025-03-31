@@ -29,6 +29,11 @@ function handleHashChange() {
                 loadChapter(currentChapter);
             }
         }
+    } else if (chapters.length > 0) {
+        // If no URL hash but we have chapters loaded, load first chapter
+        currentChapter = chapters[0].chapter;
+        currentPage = 1;
+        loadChapter(currentChapter);
     }
 }
 
@@ -149,4 +154,30 @@ document.addEventListener('DOMContentLoaded', () => {
             handleHashChange();
         })
         .catch(error => console.error('Error loading chapters:', error));
+});
+
+// Update your initial data load section
+document.addEventListener('DOMContentLoaded', () => {
+    // ... (keep all your existing event listeners)
+
+    // Initial data load
+    fetch('./chapters.json')
+        .then(response => response.json())
+        .then(data => {
+            chapters = data;
+            // Populate chapter dropdown
+            const chapterSelect = document.getElementById('chapter-select');
+            chapterSelect.innerHTML = chapters.map(ch => 
+                `<option value="${ch.chapter}">Chapter ${ch.chapter}</option>`
+            ).join('');
+            
+            // Always call handleHashChange after loading chapters
+            handleHashChange();
+        })
+        .catch(error => {
+            console.error('Error loading chapters:', error);
+            // Fallback in case of error
+            chapters = [{chapter: 1, pages: 1}];
+            handleHashChange();
+        });
 });
